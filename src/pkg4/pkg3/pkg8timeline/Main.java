@@ -1,15 +1,18 @@
 package pkg4.pkg3.pkg8timeline;
 
 import com.sun.javafx.perf.PerformanceTracker;
+import javafx.animation.KeyFrame;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.animation.Timeline;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  *
@@ -17,43 +20,59 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
     
-    public static double ballSpeed= 1;
+    public static double ballSpeedX= 1;
+    public static double ballSpeedY= 1;
     @Override
     public void start(Stage primaryStage) {
         //Tittle
         primaryStage.setTitle("Timeline");
       
+        //Creating a new group
         Group pane = new Group();
-        // Bola que se usará para la animación
+        
+        //Creating a new scene
+        Scene scene = new Scene(pane, 300, 250);
+        
+        //Creating a ball
         Circle ball = new Circle(10);
         ball.setTranslateX(300 * 0.5);
         ball.setTranslateY(250 * 0.5);
         pane.getChildren().addAll(ball);
 
-        // Etiqueta que mostrará el valor de frames por segundo (FPS)
+        //Creating a Label (FPS)
         Label label = new Label();
         label.setTranslateX(10);
         label.setTranslateY(10);
         pane.getChildren().addAll(label);
-        Scene scene = new Scene(pane, 300, 250);
+        
+        
 
-        //Escuchador a incluir en el bucle de Timeline
+        //Listener for the Timeline loop
         EventHandler<ActionEvent> eH = e->{
-            // Mostrar la frecuencia de refresco FPS
-            PerformanceTracker perfTracker=
-            PerformanceTracker.getSceneTracker(scene);
+            //Showing FPS
+            PerformanceTracker perfTracker = PerformanceTracker.getSceneTracker(scene);
             label.setText("FPS (Timeline) = "+perfTracker.getInstantFPS());
 
-            // Cambiar la dirección de la bola si llega a los extremos
-            if(ball.getTranslateX()< 0 || ball.getTranslateX()> 300){
-                ballSpeed*=-1;
+            // Change the direction of the ball if it reaches the extremes
+            if(ball.getTranslateX()< 10 || ball.getTranslateX()> 280){
+                ballSpeedX*=-1;
+            } else if (ball.getTranslateY()< 10 || ball.getTranslateY()> 230){
+                ballSpeedY*=-1;
+            } else {
+                ballSpeedX = 1;
+                ballSpeedY = 1;
+                ballSpeedX *= ((int) (Math.random() * 15)) - 1;
+                ballSpeedY *= ((int) (Math.random() * 15)) - 1;
             }
-            ball.setTranslateX(ball.getTranslateX()+ballSpeed);
+            //Moving the ball
+            ball.setTranslateY(ball.getTranslateY()+ballSpeedY);
+            ball.setTranslateX(ball.getTranslateX()+ballSpeedX);
         };
-        //Pane root = new Pane();
-        //root.getChildren().add(ball);
-
         
+        //Timeline
+        Timeline tl = new Timeline(new KeyFrame(Duration.millis(500), eH));
+        tl.setCycleCount(Timeline.INDEFINITE);
+        tl.play();
         
         primaryStage.setScene(scene);
         primaryStage.show();
